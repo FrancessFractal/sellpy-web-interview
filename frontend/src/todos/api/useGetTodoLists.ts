@@ -10,9 +10,11 @@ type TTodoLists = {
     [listId: string]: TodoListType
 }
 
+export const GetTodoListsQueryKey = () => ['useGetTodoLists']
+
 export const useGetTodoLists = () => {
     return useQuery<TTodoLists>({
-        queryKey: ['getTodoLists'],
+        queryKey: GetTodoListsQueryKey(),
         queryFn: () => {
             return sleep(1000).then(() =>
                 Promise.resolve(currentState)

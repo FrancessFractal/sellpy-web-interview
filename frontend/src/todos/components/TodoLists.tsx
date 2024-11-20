@@ -1,4 +1,4 @@
-import React, { Fragment, useState, type CSSProperties } from 'react'
+import React, { Fragment, useState, type CSSProperties, useMemo } from 'react'
 import {
   Card,
   CardContent,
@@ -15,7 +15,8 @@ import { useGetTodoLists } from '../api/useGetTodoLists'
 export const TodoLists = ({ style }: { style: CSSProperties }) => {
   const { data: todoLists, isError, isLoading } = useGetTodoLists()
 
-  const [activeList, setActiveList] = useState<string>()
+  const [activeListId, setActiveListId] = useState<string>()
+  const activeList = useMemo(() => todoLists && activeListId && todoLists[activeListId], [todoLists, activeListId])
 
   // todo: I would normally ask for a design for these. assuming this is fine for scope of the test
   if (isError) {
@@ -26,7 +27,6 @@ export const TodoLists = ({ style }: { style: CSSProperties }) => {
     return 'Loading'
   }
 
-  // fixme: why isn't ts helping here like it should?
   if (!todoLists || !Object.keys(todoLists).length) return null
   return (
     <Fragment>
@@ -35,7 +35,7 @@ export const TodoLists = ({ style }: { style: CSSProperties }) => {
           <Typography component='h2'>My Todo Lists</Typography>
           <List>
             {Object.keys(todoLists).map((key) => (
-              <ListItemButton key={key} onClick={() => setActiveList(key)}>
+              <ListItemButton key={key} onClick={() => setActiveListId(key)}>
                 <ListItemIcon>
                   <ReceiptIcon />
                 </ListItemIcon>
@@ -45,10 +45,9 @@ export const TodoLists = ({ style }: { style: CSSProperties }) => {
           </List>
         </CardContent>
       </Card>
-      {activeList && todoLists[activeList] && (
+      {activeList && (
         <TodoListForm
-          key={activeList} // use key to make React recreate component to reset internal state
-          todoList={todoLists[activeList]}
+          todoList={activeList}
         />
       )}
     </Fragment>

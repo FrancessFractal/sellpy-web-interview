@@ -1,9 +1,20 @@
 import { TextField, Button, Typography } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { useSetTodos } from '../api/useSetTodos'
+import { useUpdateTodoListItem } from '../api/useUpdateTodoListItem'
+import { useDeleteTodoItem } from '../api/useDeleteTodoItem'
+import { useCallback, type ChangeEventHandler, type MouseEventHandler } from 'react'
 
-export const TodoListItem = ({ name, index, listId, todos }: { name: string, index: number, listId: string, todos: string[] }) => {
-    const { mutate: setTodos, isPending } = useSetTodos(listId)
+export const TodoListItem = ({ name, index, listId }: { name: string, index: number, listId: string }) => {
+    const { mutate: updateTodoListItem, isPending: updatePending } = useUpdateTodoListItem(listId, index)
+    const { mutate: deleteTodoItem, isPending: deletePending } = useDeleteTodoItem(listId, index);
+    const isPending = updatePending || deletePending;
+
+    const updateTodoListItemHandler: ChangeEventHandler<HTMLInputElement> = useCallback((event) => {
+        updateTodoListItem(event.target.value)
+    }, [updateTodoListItem]);
+    const deleteTodoItemHandler: MouseEventHandler = useCallback(() => {
+        deleteTodoItem()
+    }, [deleteTodoItem]);
 
     return <div style={{ display: 'flex', alignItems: 'center' }}>
         <Typography sx={{ margin: '8px' }} variant='h6'>
@@ -14,27 +25,14 @@ export const TodoListItem = ({ name, index, listId, todos }: { name: string, ind
             label='What to do?'
             value={name}
             disabled={isPending}
-            onChange={(event) => {
-                setTodos([
-                    // immutable update
-                    ...todos.slice(0, index),
-                    event.target.value,
-                    ...todos.slice(index + 1),
-                ])
-            }}
+            onChange={updateTodoListItemHandler}
         />
         <Button
             sx={{ margin: '8px' }}
             size='small'
             color='secondary'
             disabled={isPending}
-            onClick={() => {
-                setTodos([
-                    // immutable delete
-                    ...todos.slice(0, index),
-                    ...todos.slice(index + 1),
-                ])
-            }}
+            onClick={deleteTodoItemHandler}
         >
             <DeleteIcon />
         </Button>
