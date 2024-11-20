@@ -7,7 +7,7 @@ import { useSetTodos } from '../api/useSetTodos'
 export const TodoListForm = ({ todoList }: {
   todoList: TodoListType,
 }) => {
-  const { mutate: setTodos } = useSetTodos(todoList.id)
+  const { mutate: setTodos, isPending } = useSetTodos(todoList.id)
 
   return (
     <Card sx={{ margin: '0 1rem' }}>
@@ -25,6 +25,7 @@ export const TodoListForm = ({ todoList }: {
                 sx={{ flexGrow: 1, marginTop: '1rem' }}
                 label='What to do?'
                 value={name}
+                disabled={isPending}
                 onChange={(event) => {
                   setTodos([
                     // immutable update
@@ -38,6 +39,7 @@ export const TodoListForm = ({ todoList }: {
                 sx={{ margin: '8px' }}
                 size='small'
                 color='secondary'
+                disabled={isPending}
                 onClick={() => {
                   setTodos([
                     // immutable delete
@@ -54,6 +56,7 @@ export const TodoListForm = ({ todoList }: {
             <Button
               type='button'
               color='primary'
+              disabled={isPending}
               onClick={() => {
                 setTodos([...todoList.todos, ''])
               }}
