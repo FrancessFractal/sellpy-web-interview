@@ -1,22 +1,27 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { GetTodoListsQueryKey } from "./useGetTodoLists"
-import { GetTodoListsItemsQueryKey } from "./useGetTodoListItems"
+import { GetTodoListsItemsQueryKey, useGetTodoListItems } from "./useGetTodoListItems"
 import { API_URI } from "../../config"
 
 
-export const useUpdateTodoListItemText = (listId: string, todoId: string) => {
+export const useChangeTodoListItemCompletion = (listId: string, todoId: string) => {
     const queryClient = useQueryClient()
+    const { data: currentTodos, isLoading, isError } = useGetTodoListItems(listId);
 
     return useMutation({
         mutationKey: ['useUpdateTodoListItem', listId],
-        mutationFn: async (value: string) => {
+        mutationFn: async (value: boolean) => {
+            if (isError || isLoading || !currentTodos) {
+                throw Error('Could not add todo item')
+            }
+
             const response = await fetch(`${API_URI}/todo-lists/${listId}/todos/${todoId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    text: value
+                    completed: value
                 })
             });
 

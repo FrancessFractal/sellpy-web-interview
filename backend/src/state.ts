@@ -9,7 +9,8 @@ const listsState: { [listId: string]: TodoListType } = {
         todos: {
             '286dc217-9617-4043-b17e-8214555595f8': {
                 id: '286dc217-9617-4043-b17e-8214555595f8',
-                text: 'First todo of first list!'
+                text: 'First todo of first list!',
+                completed: false,
             },
         },
     },
@@ -19,7 +20,8 @@ const listsState: { [listId: string]: TodoListType } = {
         todos: {
             'e3399fb1-19e7-4309-8570-079b0e8bf61c': {
                 id: 'e3399fb1-19e7-4309-8570-079b0e8bf61c',
-                text: 'First todo of second list!'
+                text: 'First todo of second list!',
+                completed: false,
             }
         },
     },

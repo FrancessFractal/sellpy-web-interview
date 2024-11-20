@@ -43,7 +43,8 @@ todoListRouter.post('/:id/todos/new', async (req, res) => {
         ...list.todos,
         [id]: {
             id,
-            text: ''
+            text: '',
+            completed: false,
         }
     }
     res.send()
@@ -72,6 +73,7 @@ todoListRouter.patch('/:listId/todos/:todoId', async (req, res) => {
     }
 
     todo.text = req.body.text ?? todo.text
+    todo.completed = req.body.completed ?? todo.completed
 
     res.send()
 })
