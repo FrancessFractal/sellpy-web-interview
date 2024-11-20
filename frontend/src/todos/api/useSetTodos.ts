@@ -10,7 +10,7 @@ export const useSetTodos = (listId: string) => {
     return useMutation({
         mutationKey: ['useSetTodos', listId],
         mutationFn: async (value: string[]) => {
-            return sleep(1000).then(() => {
+            return sleep(2000).then(() => {
                 if (!currentState[listId]) {
                     throw Error(`List ${listId} does not exist`)
                 }
@@ -18,6 +18,9 @@ export const useSetTodos = (listId: string) => {
                 currentState[listId].todos = value;
                 Promise.resolve()
             })
+        },
+        scope: {
+            id: 'useSetTodos'
         }
     })
 }
