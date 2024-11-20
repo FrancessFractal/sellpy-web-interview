@@ -1,12 +1,16 @@
-import React, { useState } from 'react'
+import React, { useState, type FormEventHandler } from 'react'
 import { TextField, Card, CardContent, CardActions, Button, Typography } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
+import type { TodoListType } from '../models/TodoList'
 
-export const TodoListForm = ({ todoList, saveTodoList }) => {
+export const TodoListForm = ({ todoList, saveTodoList }: {
+  todoList: TodoListType,
+  saveTodoList: (id: string, todoList: Pick<TodoListType, 'todos'>) => void
+}) => {
   const [todos, setTodos] = useState(todoList.todos)
 
-  const handleSubmit = (event) => {
+  const handleSubmit: FormEventHandler = (event) => {
     event.preventDefault()
     saveTodoList(todoList.id, { todos })
   }

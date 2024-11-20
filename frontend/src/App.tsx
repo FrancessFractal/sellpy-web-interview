@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { type CSSProperties, type ReactNode } from 'react'
 import { AppBar, Toolbar, Typography } from '@mui/material'
 import { TodoLists } from './todos/components/TodoLists'
 
@@ -14,15 +14,15 @@ const MainAppBar = () => {
   )
 }
 
-const mainWrapperStyle = { display: 'flex', flexDirection: 'column' }
-const centerContentWrapper = { display: 'flex', justifyContent: 'center' }
-const contentWrapperStyle = {
+const mainWrapperStyle: CSSProperties = { display: 'flex', flexDirection: 'column' }
+const centerContentWrapper: CSSProperties = { display: 'flex', justifyContent: 'center' }
+const contentWrapperStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   maxWidth: '80rem',
   flexGrow: 1,
 }
-const MainWrapper = ({ children }) => {
+const MainWrapper = ({ children }: { children: ReactNode }) => {
   return (
     <div style={mainWrapperStyle}>
       <MainAppBar />

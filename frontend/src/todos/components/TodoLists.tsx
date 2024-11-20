@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from 'react'
+import React, { Fragment, useState, useEffect, type CSSProperties } from 'react'
 import {
   Card,
   CardContent,
@@ -10,11 +10,16 @@ import {
 } from '@mui/material'
 import ReceiptIcon from '@mui/icons-material/Receipt'
 import { TodoListForm } from './TodoListForm'
+import type { TodoListType } from '../models/TodoList'
 
 // Simulate network
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-const fetchTodoLists = () => {
+type TTodoLists = {
+  [listId: string]: TodoListType
+}
+
+const fetchTodoLists = (): Promise<TTodoLists> => {
   return sleep(1000).then(() =>
     Promise.resolve({
       '0000000001': {
@@ -27,13 +32,13 @@ const fetchTodoLists = () => {
         title: 'Second List',
         todos: ['First todo of second list!'],
       },
-    })
+    } as TTodoLists)
   )
 }
 
-export const TodoLists = ({ style }) => {
-  const [todoLists, setTodoLists] = useState({})
-  const [activeList, setActiveList] = useState()
+export const TodoLists = ({ style }: { style: CSSProperties }) => {
+  const [todoLists, setTodoLists] = useState<TTodoLists>({})
+  const [activeList, setActiveList] = useState<string>()
 
   useEffect(() => {
     fetchTodoLists().then(setTodoLists)
@@ -51,18 +56,21 @@ export const TodoLists = ({ style }) => {
                 <ListItemIcon>
                   <ReceiptIcon />
                 </ListItemIcon>
-                <ListItemText primary={todoLists[key].title} />
+                <ListItemText primary={todoLists[key]?.title} />
               </ListItemButton>
             ))}
           </List>
         </CardContent>
       </Card>
-      {todoLists[activeList] && (
+      {activeList && todoLists[activeList] && (
         <TodoListForm
           key={activeList} // use key to make React recreate component to reset internal state
           todoList={todoLists[activeList]}
           saveTodoList={(id, { todos }) => {
             const listToUpdate = todoLists[id]
+            if (!listToUpdate) {
+              throw Error('List does not exist')
+            }
             setTodoLists({
               ...todoLists,
               [id]: { ...listToUpdate, todos },
