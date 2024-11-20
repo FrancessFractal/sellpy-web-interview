@@ -1,29 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { GetTodoListsQueryKey } from "./useGetTodoLists"
-import { GetTodoListsItemsQueryKey, useGetTodoListItems } from "./useGetTodoListItems"
+import { GetTodoListsItemsQueryKey } from "./useGetTodoListItems"
 import { API_URI } from "../../config"
 
-export const useDeleteTodoItem = (listId: string, index: number) => {
+export const useDeleteTodoItem = (listId: string, todoId: string) => {
     const queryClient = useQueryClient()
-    const { data: currentTodos, isLoading, isError } = useGetTodoListItems(listId);
 
     return useMutation({
         mutationKey: ['useDeleteTodoItem', listId],
         mutationFn: async () => {
-            if (isError || isLoading || !currentTodos) {
-                throw Error('Could not add todo item')
-            }
-
-            const response = await fetch(`${API_URI}/todo-lists/${listId}/todos`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify([
-                    // immutable delete
-                    ...currentTodos.slice(0, index),
-                    ...currentTodos.slice(index + 1),
-                ])
+            const response = await fetch(`${API_URI}/todo-lists/${listId}/todos/${todoId}`, {
+                method: 'DELETE',
             });
 
             if (!response.ok) {

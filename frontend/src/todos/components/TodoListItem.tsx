@@ -1,12 +1,13 @@
 import { TextField, Button, Typography, debounce } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { useUpdateTodoListItem } from '../api/useUpdateTodoListItem'
+import { useUpdateTodoListItemText } from '../api/useUpdateTodoListItemText'
 import { useDeleteTodoItem } from '../api/useDeleteTodoItem'
 import { useCallback, useMemo, useState, type ChangeEventHandler, type MouseEventHandler } from 'react'
+import type { TodoListItemType } from '../models/TodoListItem'
 
-export const TodoListItem = ({ name, index, listId }: { name: string, index: number, listId: string }) => {
-    const { mutate: updateTodoListItem } = useUpdateTodoListItem(listId, index)
-    const [text, setText] = useState<string>(name);
+export const TodoListItem = ({ todoItem, index, listId }: { todoItem: TodoListItemType, index: number, listId: string }) => {
+    const { mutate: updateTodoListItem } = useUpdateTodoListItemText(listId, todoItem.id)
+    const [text, setText] = useState<string>(todoItem.text);
     const debouncedUpdate = useMemo(() => debounce(updateTodoListItem, 300), [updateTodoListItem])
     const updateTodoListItemHandler: ChangeEventHandler<HTMLInputElement> = useCallback((event) => {
         setText(event.target.value)
@@ -14,7 +15,7 @@ export const TodoListItem = ({ name, index, listId }: { name: string, index: num
     }, [debouncedUpdate]);
 
 
-    const { mutate: deleteTodoItem, isPending } = useDeleteTodoItem(listId, index);
+    const { mutate: deleteTodoItem, isPending } = useDeleteTodoItem(listId, todoItem.id);
     const deleteTodoItemHandler: MouseEventHandler = useCallback(() => {
         deleteTodoItem()
     }, [deleteTodoItem]);

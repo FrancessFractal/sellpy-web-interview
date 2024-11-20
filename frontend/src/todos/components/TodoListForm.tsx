@@ -21,8 +21,8 @@ export const TodoListForm = ({ todoList }: {
         <form
           style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}
         >
-          {isLoading ? 'Loading' : isError ? 'Error' : todos?.map((name, index) => (
-            <TodoListItem key={index} name={name} index={index} listId={todoList.id} />
+          {isLoading ? 'Loading' : isError ? 'Error' : todos?.map((todoItem, index) => (
+            <TodoListItem key={todoItem.id} todoItem={todoItem} index={index} listId={todoList.id} />
           ))}
           <CardActions>
             <Button

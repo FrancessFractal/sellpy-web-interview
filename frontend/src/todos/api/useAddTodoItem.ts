@@ -15,12 +15,8 @@ export const useAddTodoItem = (listId: string) => {
                 throw Error('Could not add todo item')
             }
 
-            const response = await fetch(`${API_URI}/todo-lists/${listId}/todos`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify([...currentTodos, ''])
+            const response = await fetch(`${API_URI}/todo-lists/${listId}/todos/new`, {
+                method: 'POST',
             });
 
             if (!response.ok) {

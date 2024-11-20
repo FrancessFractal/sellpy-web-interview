@@ -4,7 +4,7 @@ import { GetTodoListsItemsQueryKey, useGetTodoListItems } from "./useGetTodoList
 import { API_URI } from "../../config"
 
 
-export const useUpdateTodoListItem = (listId: string, index: number) => {
+export const useUpdateTodoListItemText = (listId: string, todoId: string) => {
     const queryClient = useQueryClient()
     const { data: currentTodos, isLoading, isError } = useGetTodoListItems(listId);
 
@@ -15,17 +15,14 @@ export const useUpdateTodoListItem = (listId: string, index: number) => {
                 throw Error('Could not add todo item')
             }
 
-            const response = await fetch(`${API_URI}/todo-lists/${listId}/todos`, {
-                method: 'PUT',
+            const response = await fetch(`${API_URI}/todo-lists/${listId}/todos/${todoId}`, {
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify([
-                    // immutable update
-                    ...currentTodos.slice(0, index),
-                    value,
-                    ...currentTodos.slice(index + 1),
-                ])
+                body: JSON.stringify({
+                    text: value
+                })
             });
 
             if (!response.ok) {

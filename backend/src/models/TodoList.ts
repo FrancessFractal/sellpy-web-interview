@@ -2,5 +2,10 @@
 export type TodoListType = {
     id: string,
     title: string,
-    todos: string[]
+    todos: {
+        [listItemId: string]: {
+            id: string,
+            text: string
+        }
+    }
 }
