@@ -1,29 +1,22 @@
-import React, { useState, type FormEventHandler } from 'react'
 import { TextField, Card, CardContent, CardActions, Button, Typography } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
 import type { TodoListType } from '../models/TodoList'
+import { useSetTodos } from '../api/useSetTodos'
 
-export const TodoListForm = ({ todoList, saveTodoList }: {
+export const TodoListForm = ({ todoList }: {
   todoList: TodoListType,
-  saveTodoList: (id: string, todoList: Pick<TodoListType, 'todos'>) => void
 }) => {
-  const [todos, setTodos] = useState(todoList.todos)
-
-  const handleSubmit: FormEventHandler = (event) => {
-    event.preventDefault()
-    saveTodoList(todoList.id, { todos })
-  }
+  const { mutate: setTodos } = useSetTodos(todoList.id)
 
   return (
     <Card sx={{ margin: '0 1rem' }}>
       <CardContent>
         <Typography component='h2'>{todoList.title}</Typography>
         <form
-          onSubmit={handleSubmit}
           style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}
         >
-          {todos.map((name, index) => (
+          {todoList.todos.map((name, index) => (
             <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
               <Typography sx={{ margin: '8px' }} variant='h6'>
                 {index + 1}
@@ -35,9 +28,9 @@ export const TodoListForm = ({ todoList, saveTodoList }: {
                 onChange={(event) => {
                   setTodos([
                     // immutable update
-                    ...todos.slice(0, index),
+                    ...todoList.todos.slice(0, index),
                     event.target.value,
-                    ...todos.slice(index + 1),
+                    ...todoList.todos.slice(index + 1),
                   ])
                 }}
               />
@@ -48,8 +41,8 @@ export const TodoListForm = ({ todoList, saveTodoList }: {
                 onClick={() => {
                   setTodos([
                     // immutable delete
-                    ...todos.slice(0, index),
-                    ...todos.slice(index + 1),
+                    ...todoList.todos.slice(0, index),
+                    ...todoList.todos.slice(index + 1),
                   ])
                 }}
               >
@@ -62,13 +55,10 @@ export const TodoListForm = ({ todoList, saveTodoList }: {
               type='button'
               color='primary'
               onClick={() => {
-                setTodos([...todos, ''])
+                setTodos([...todoList.todos, ''])
               }}
             >
               Add Todo <AddIcon />
-            </Button>
-            <Button type='submit' variant='contained' color='primary'>
-              Save
             </Button>
           </CardActions>
         </form>
