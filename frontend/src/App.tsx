@@ -1,6 +1,7 @@
 import React, { type CSSProperties, type ReactNode } from 'react'
 import { AppBar, Toolbar, Typography } from '@mui/material'
 import { TodoLists } from './todos/components/TodoLists'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 const MainAppBar = () => {
   return (
@@ -22,14 +23,18 @@ const contentWrapperStyle: CSSProperties = {
   maxWidth: '80rem',
   flexGrow: 1,
 }
+
+const queryClient = new QueryClient();
 const MainWrapper = ({ children }: { children: ReactNode }) => {
   return (
-    <div style={mainWrapperStyle}>
-      <MainAppBar />
-      <div style={centerContentWrapper}>
-        <div style={contentWrapperStyle}>{children}</div>
+    <QueryClientProvider client={queryClient}>
+      <div style={mainWrapperStyle}>
+        <MainAppBar />
+        <div style={centerContentWrapper}>
+          <div style={contentWrapperStyle}>{children}</div>
+        </div>
       </div>
-    </div>
+    </QueryClientProvider>
   )
 }
 

@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect, type CSSProperties } from 'react'
+import React, { Fragment, useState, type CSSProperties } from 'react'
 import {
   Card,
   CardContent,
@@ -10,41 +10,24 @@ import {
 } from '@mui/material'
 import ReceiptIcon from '@mui/icons-material/Receipt'
 import { TodoListForm } from './TodoListForm'
-import type { TodoListType } from '../models/TodoList'
-
-// Simulate network
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-
-type TTodoLists = {
-  [listId: string]: TodoListType
-}
-
-const fetchTodoLists = (): Promise<TTodoLists> => {
-  return sleep(1000).then(() =>
-    Promise.resolve({
-      '0000000001': {
-        id: '0000000001',
-        title: 'First List',
-        todos: ['First todo of first list!'],
-      },
-      '0000000002': {
-        id: '0000000002',
-        title: 'Second List',
-        todos: ['First todo of second list!'],
-      },
-    } as TTodoLists)
-  )
-}
+import { useGetTodoLists } from '../api/useGetTodoLists'
 
 export const TodoLists = ({ style }: { style: CSSProperties }) => {
-  const [todoLists, setTodoLists] = useState<TTodoLists>({})
+  const { data: todoLists, isError, isLoading } = useGetTodoLists()
+
   const [activeList, setActiveList] = useState<string>()
 
-  useEffect(() => {
-    fetchTodoLists().then(setTodoLists)
-  }, [])
+  // todo: I would normally ask for a design for these. assuming this is fine for scope of the test
+  if (isError) {
+    return 'Error'
+  }
 
-  if (!Object.keys(todoLists).length) return null
+  if (isLoading) {
+    return 'Loading'
+  }
+
+  // fixme: why isn't ts helping here like it should?
+  if (!todoLists || !Object.keys(todoLists).length) return null
   return (
     <Fragment>
       <Card style={style}>
@@ -67,14 +50,7 @@ export const TodoLists = ({ style }: { style: CSSProperties }) => {
           key={activeList} // use key to make React recreate component to reset internal state
           todoList={todoLists[activeList]}
           saveTodoList={(id, { todos }) => {
-            const listToUpdate = todoLists[id]
-            if (!listToUpdate) {
-              throw Error('List does not exist')
-            }
-            setTodoLists({
-              ...todoLists,
-              [id]: { ...listToUpdate, todos },
-            })
+            // todo save todo lists
           }}
         />
       )}
