@@ -10,10 +10,6 @@ app.use(express.json())
 
 const PORT = 3001
 
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-})
-
 const todoListRouter = express.Router()
 todoListRouter.get('/', (req, res) => {
     res.send({ data: currentState.listsState })
@@ -27,7 +23,8 @@ todoListRouter.get('/:id', async (req, res) => {
 todoListRouter.get('/:id/todos', async (req, res) => {
     const list = currentState.listsState[req.params.id];
     if (!list) {
-        throw Error('List does not exist')
+        res.status(400).send({ error: 'List does not exist' })
+        return
     }
 
     res.send({ data: Object.values(list.todos) })
@@ -36,7 +33,8 @@ todoListRouter.get('/:id/todos', async (req, res) => {
 todoListRouter.post('/:id/todos/new', async (req, res) => {
     const list = currentState.listsState[req.params.id];
     if (!list) {
-        throw Error('List does not exist')
+        res.status(400).send({ error: 'List does not exist' })
+        return
     }
 
     const id = uuidV4()
@@ -53,7 +51,8 @@ todoListRouter.post('/:id/todos/new', async (req, res) => {
 todoListRouter.delete('/:listid/todos/:todoid', async (req, res) => {
     const list = currentState.listsState[req.params.listid];
     if (!list) {
-        throw Error('List does not exist')
+        res.status(400).send({ error: 'List does not exist' })
+        return
     }
 
     delete list.todos[req.params.todoid]
@@ -62,12 +61,14 @@ todoListRouter.delete('/:listid/todos/:todoid', async (req, res) => {
 todoListRouter.patch('/:listId/todos/:todoId', async (req, res) => {
     const list = currentState.listsState[req.params.listId];
     if (!list) {
-        throw Error('List does not exist')
+        res.status(400).send({ error: 'List does not exist' })
+        return
     }
 
     const todo = list.todos[req.params.todoId]
     if (!todo) {
-        throw Error('Todo does not exist')
+        res.status(400).send({ error: 'Todo does not exist' })
+        return
     }
 
     todo.text = req.body.text ?? todo.text
