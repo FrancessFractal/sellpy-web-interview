@@ -1,31 +1,38 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { currentState } from "./state"
+import { API_URI } from "../../config"
+import { GetTodoListsItemsQueryKey, useGetTodoListItems } from "./useGetTodoListItems"
 import { GetTodoListsQueryKey } from "./useGetTodoLists"
-
-// Simulate network
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 
 export const useAddTodoItem = (listId: string) => {
     const queryClient = useQueryClient()
+    const { data: currentTodos, isLoading, isError } = useGetTodoListItems(listId);
 
     return useMutation({
         mutationKey: ['useAddTodoItem', listId],
         mutationFn: async () => {
-            return sleep(2000).then(() => {
-                if (!currentState[listId]) {
-                    throw Error(`List ${listId} does not exist`)
-                }
+            if (isError || isLoading || !currentTodos) {
+                throw Error('Could not add todo item')
+            }
 
-                currentState[listId].todos = [...currentState[listId].todos, ''];
-                Promise.resolve()
-            })
+            const response = await fetch(`${API_URI}/todo-lists/${listId}/todos`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify([...currentTodos, ''])
+            });
+
+            if (!response.ok) {
+                throw Error('Could not add todo item')
+            }
         },
         scope: {
             id: 'useSetTodos'
         },
         onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: GetTodoListsItemsQueryKey(listId) })
             queryClient.invalidateQueries({ queryKey: GetTodoListsQueryKey() })
-        }
+        },
     })
 }

@@ -1,35 +1,42 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { currentState } from "./state"
 import { GetTodoListsQueryKey } from "./useGetTodoLists"
-
-// Simulate network
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+import { GetTodoListsItemsQueryKey, useGetTodoListItems } from "./useGetTodoListItems"
+import { API_URI } from "../../config"
 
 
 export const useUpdateTodoListItem = (listId: string, index: number) => {
     const queryClient = useQueryClient()
+    const { data: currentTodos, isLoading, isError } = useGetTodoListItems(listId);
 
     return useMutation({
         mutationKey: ['useUpdateTodoListItem', listId],
         mutationFn: async (value: string) => {
-            return sleep(2000).then(() => {
-                if (!currentState[listId]) {
-                    throw Error(`List ${listId} does not exist`)
-                }
+            if (isError || isLoading || !currentTodos) {
+                throw Error('Could not add todo item')
+            }
 
-                currentState[listId].todos = [
+            const response = await fetch(`${API_URI}/todo-lists/${listId}/todos`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify([
                     // immutable update
-                    ...currentState[listId].todos.slice(0, index),
+                    ...currentTodos.slice(0, index),
                     value,
-                    ...currentState[listId].todos.slice(index + 1),
-                ];
-                Promise.resolve()
-            })
+                    ...currentTodos.slice(index + 1),
+                ])
+            });
+
+            if (!response.ok) {
+                throw Error('Could not add todo item')
+            }
         },
         scope: {
             id: 'useSetTodos'
         },
         onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: GetTodoListsItemsQueryKey(listId) })
             queryClient.invalidateQueries({ queryKey: GetTodoListsQueryKey() })
         }
     })

@@ -1,8 +1,8 @@
 // temporary local state to use before we move this to BE
 
-import type { TodoListType } from "../models/TodoList";
+import type { TodoListType } from "./models/TodoList";
 
-export const currentState: { [listId: string]: TodoListType } = {
+const listsState: { [listId: string]: TodoListType } = {
     '0000000001': {
         id: '0000000001',
         title: 'First List',
@@ -14,3 +14,7 @@ export const currentState: { [listId: string]: TodoListType } = {
         todos: ['First todo of second list!'],
     },
 };
+
+export const currentState = {
+    listsState,
+}

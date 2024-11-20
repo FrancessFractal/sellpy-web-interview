@@ -1,24 +1,28 @@
 
 import { useQuery } from '@tanstack/react-query'
-import { GetTodoListsQueryKey, useGetTodoLists } from './useGetTodoLists'
+import { API_URI } from '../../config';
 
-export const GetTodoListsItemsQueryKey = (listId: string) => [...GetTodoListsQueryKey(), 'useGetTodoListItems', listId]
+export const GetTodoListsItemsQueryKey = (listId: string) => ['useGetTodoListItems', listId]
 
 export const useGetTodoListItems = (listId: string) => {
-    const { data: todoLists, isLoading, isError } = useGetTodoLists();
-
     return useQuery<string[]>({
         queryKey: GetTodoListsItemsQueryKey(listId),
-        queryFn: () => {
-            if (isError || !todoLists) {
-                throw Error('could not load todo lists')
+        queryFn: async () => {
+            const response = await fetch(`${API_URI}/todo-lists/${listId}`);
+
+            if (!response.ok) {
+                throw new Error(`${response.status}`)
             }
-            if (!todoLists[listId]) {
-                throw Error(`List ${listId} does not exist`)
+
+            const responseBody = await response.json()
+
+            // todo would be best to do more data sanitization here, but considering oos for this test         
+            if (!responseBody.data.todos) {
+                throw Error('Bad api response')
             }
-            return Promise.resolve(todoLists[listId].todos)
-        },
-        enabled: !isLoading
+
+            return responseBody.data.todos
+        }
     })
 }
 
